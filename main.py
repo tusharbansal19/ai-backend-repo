@@ -2,7 +2,10 @@ print("DEBUG: main.py is being loaded...")
 import os
 from dotenv import load_dotenv
 load_dotenv()
+print("STARTING APP...")
 print(f"DEBUG: Environment loaded. PORT={os.getenv('PORT')}")
+print(f"DEBUG: OWNER_NAME: {os.getenv('OWNER_NAME', 'NOT SET')}")
+
 """
 main.py — FastAPI application entry point for the portfolio assistant.
 """
@@ -12,34 +15,40 @@ import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routes.chat_routes import router as chat_router
-from routes.health_routes import router as health_router
+try:
+    from routes.chat_routes import router as chat_router
+    from routes.health_routes import router as health_router
+    print("Imports successful [OK]")
+except Exception as e:
+    print("IMPORT ERROR [FAIL]:", e)
+    raise e
+
 from utils.error_handler import global_exception_handler
 from utils.rate_limiter import rate_limit_middleware
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print("DEBUG: Lifespan starting...")
-    print("Initializing models and FAISS datastore...")
-    from rag.embedder import get_embedding_model
-    from config.faiss_store import get_faiss_store
-    from scripts.ingest_documents import ingest
+    """
+    LAZY LOADING STRATEGY:
+    We no longer pre-load models or FAISS here. 
+    This allows the app to start instantly on Render free tier 
+    without hitting the 30s timeout or 512MB RAM limit during startup.
+    Models will load on the first request instead.
+    """
+    print("DEBUG: Lifespan starting (Fast Startup Mode)...")
+    print("Models will be lazy-loaded on the first request to save memory.")
     
-    # These functions use @lru_cache, so calling them here pre-loads them into memory
-    get_embedding_model()
-    
-    # Load FAISS. If it doesn't exist yet, ingest data
-    store = get_faiss_store()
-    if store is None:
-        print("FAISS index not found. Ingesting documents...")
-        ingest()
-        # Ingestion saved the index, so clear the lru_cache and load it again
-        get_faiss_store.cache_clear()
-        get_faiss_store()
-        
-    print("Models and datastore loaded into memory.")
+    # Optional: You can still check if FAISS index exists on disk without loading it
+    from config.faiss_store import _index_path
+    index_dir = _index_path()
+    if not (index_dir / "index.faiss").exists():
+        print("WARNING: FAISS index not found on disk. Ingestion may be needed later.")
+    else:
+        print("DEBUG: FAISS index detected on disk.")
+
     yield
+    print("DEBUG: Lifespan ending...")
 
 
 app = FastAPI(
