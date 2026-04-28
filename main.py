@@ -1,60 +1,28 @@
-print("DEBUG: main.py is being loaded...")
+print("DEBUG: main.py is being loaded (ULTRA-LIGHT MODE)...")
 import os
 from dotenv import load_dotenv
 load_dotenv()
 print("STARTING APP...")
-print(f"DEBUG: Environment loaded. PORT={os.getenv('PORT')}")
-print(f"DEBUG: OWNER_NAME: {os.getenv('OWNER_NAME', 'NOT SET')}")
 
 """
 main.py — FastAPI application entry point for the portfolio assistant.
+Optimized for 512MB RAM / 30s timeout environments (Render Free Tier).
 """
 from contextlib import asynccontextmanager
-
-import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-try:
-    from routes.chat_routes import router as chat_router
-    from routes.health_routes import router as health_router
-    print("Imports successful [OK]")
-except Exception as e:
-    print("IMPORT ERROR [FAIL]:", e)
-    raise e
-
-from utils.error_handler import global_exception_handler
-from utils.rate_limiter import rate_limit_middleware
-
-
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """
-    LAZY LOADING STRATEGY:
-    We no longer pre-load models or FAISS here. 
-    This allows the app to start instantly on Render free tier 
-    without hitting the 30s timeout or 512MB RAM limit during startup.
-    Models will load on the first request instead.
-    """
-    print("DEBUG: Lifespan starting (Fast Startup Mode)...")
-    print("Models will be lazy-loaded on the first request to save memory.")
-    
-    # Optional: You can still check if FAISS index exists on disk without loading it
-    from config.faiss_store import _index_path
-    index_dir = _index_path()
-    if not (index_dir / "index.faiss").exists():
-        print("WARNING: FAISS index not found on disk. Ingestion may be needed later.")
-    else:
-        print("DEBUG: FAISS index detected on disk.")
-
+    print("DEBUG: Lifespan starting (Lazy Startup)...")
+    # No heavy work here. Models and Data will load when the first API call happens.
     yield
     print("DEBUG: Lifespan ending...")
 
-
 app = FastAPI(
     title="Portfolio AI Backend",
-    description="AI assistant for Tushar Bansal's portfolio, powered by FastAPI, LangGraph, and RAG.",
-    version="3.0.0",
+    description="AI assistant for Tushar Bansal's portfolio.",
+    version="3.1.0",
     lifespan=lifespan,
     docs_url="/api/docs",
     redoc_url=None,
@@ -68,17 +36,36 @@ app.add_middleware(
     allow_headers=["Content-Type", "Authorization"],
 )
 
-app.middleware("http")(rate_limit_middleware)
-app.add_exception_handler(Exception, global_exception_handler)
+# ── LAZY ROUTE INJECTION ───────────────────────────────────────────────────
+# We define wrapper endpoints to avoid importing the entire LangChain stack at boot.
 
-app.include_router(chat_router, prefix="/chat", tags=["Chat"])
-app.include_router(health_router, prefix="/health", tags=["Health"])
+@app.post("/chat")
+async def chat_proxy(request: dict):
+    from controllers.chat_controller import handle_chat, ChatRequest
+    return await handle_chat(ChatRequest(**request))
 
+@app.delete("/chat/session")
+async def end_session_proxy(request: dict):
+    from controllers.chat_controller import handle_end_session, EndSessionRequest
+    return await handle_end_session(EndSessionRequest(**request))
+
+@app.get("/health")
+async def health_proxy():
+    from routes.health_routes import health_check
+    return await health_check()
+
+# ── ERROR HANDLING ─────────────────────────────────────────────────────────
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    from fastapi.responses import JSONResponse
+    print(f"CRITICAL ERROR: {exc}")
+    return JSONResponse(status_code=500, content={"success": False, "error": str(exc)})
 
 if __name__ == "__main__":
+    import uvicorn
     uvicorn.run(
         "main:app",
         host="0.0.0.0",
         port=int(os.getenv("PORT", "8000")),
-        reload=os.getenv("ENVIRONMENT", "development") == "development",
+        reload=False
     )
