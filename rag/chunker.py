@@ -3,7 +3,7 @@ rag/chunker.py — simple text splitter using LangChain
 """
 
 from typing import List, Dict
-from langchain.text_splitter import TokenTextSplitter
+from langchain_text_splitters import TokenTextSplitter
 
 # simple token-based splitter
 splitter = TokenTextSplitter(
