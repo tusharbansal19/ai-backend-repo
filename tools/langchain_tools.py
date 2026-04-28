@@ -38,7 +38,7 @@ def send_email(name: str, email: str, message: str) -> str:
     if not sender_email or not sender_password:
         return (
             "❌ Email service is not configured right now. "
-            f"Please reach out to {os.getenv("OWNER_NAME", "Tushar")} directly."
+            f"Please reach out to {os.getenv('OWNER_NAME', 'Tushar')} directly."
         )
 
     # Hard-coded recipient: always owner — never accept dynamic recipients
@@ -67,7 +67,7 @@ def send_email(name: str, email: str, message: str) -> str:
             server.login(sender_email, sender_password)
             server.sendmail(sender_email, recipient, msg.as_string())
         return (
-            f"✅ Your message has been sent to {os.getenv("OWNER_NAME", "Tushar")}! "
+            f"✅ Your message has been sent to {os.getenv('OWNER_NAME', 'Tushar')}! "
             f"They'll get back to you at {email} soon. 😊"
         )
     except Exception as exc:
@@ -105,7 +105,7 @@ def get_tushar_info(query: str) -> str:
     if not chunks:
         return (
             f"I couldn't find specific information about that in my knowledge base. "
-            f"Please ask a more specific question about {os.getenv("OWNER_NAME", "Tushar")}'s skills, projects, education, or experience."
+            f"Please ask a more specific question about {os.getenv('OWNER_NAME', 'Tushar')}'s skills, projects, education, or experience."
         )
     return format_context_for_prompt(chunks)
 
