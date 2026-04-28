@@ -51,10 +51,10 @@ def handle_escalation(user_message: str) -> str:
     No database writes — purely stateless.
     """
     return (
-        f"It sounds like you'd like to connect with {os.getenv("OWNER_NAME", "Tushar")} directly! 🙌\n\n"
+        f"It sounds like you'd like to connect with {os.getenv('OWNER_NAME', 'Tushar')} directly! 🙌\n\n"
         f"I can help you send him a message right now. Just share:\n"
         f"1. Your **name**\n"
         f"2. Your **email address**\n"
         f"3. Your **message**\n\n"
-        f"And I'll make sure it lands in {os.getenv("OWNER_NAME", "Tushar")}'s inbox. 📬"
+        f"And I'll make sure it lands in {os.getenv('OWNER_NAME', 'Tushar')}'s inbox. 📬"
     )
