@@ -11,18 +11,18 @@ Optimized for 512MB RAM / 30s timeout environments (Render Free Tier).
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from utils.models import ChatRequest, EndSessionRequest
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("DEBUG: Lifespan starting (Lazy Startup)...")
-    # No heavy work here. Models and Data will load when the first API call happens.
     yield
     print("DEBUG: Lifespan ending...")
 
 app = FastAPI(
     title="Portfolio AI Backend",
     description="AI assistant for Tushar Bansal's portfolio.",
-    version="3.1.0",
+    version="3.2.0",
     lifespan=lifespan,
     docs_url="/api/docs",
     redoc_url=None,
@@ -37,17 +37,16 @@ app.add_middleware(
 )
 
 # ── LAZY ROUTE INJECTION ───────────────────────────────────────────────────
-# We define wrapper endpoints to avoid importing the entire LangChain stack at boot.
 
 @app.post("/chat")
-async def chat_proxy(request: dict):
-    from controllers.chat_controller import handle_chat, ChatRequest
-    return await handle_chat(ChatRequest(**request))
+async def chat_proxy(request: ChatRequest):
+    from controllers.chat_controller import handle_chat
+    return await handle_chat(request)
 
 @app.delete("/chat/session")
-async def end_session_proxy(request: dict):
-    from controllers.chat_controller import handle_end_session, EndSessionRequest
-    return await handle_end_session(EndSessionRequest(**request))
+async def end_session_proxy(request: EndSessionRequest):
+    from controllers.chat_controller import handle_end_session
+    return await handle_end_session(request)
 
 @app.get("/health")
 async def health_proxy():
