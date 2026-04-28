@@ -16,7 +16,7 @@ langsmith
 sentence-transformers==3.0.1
 
 # ── Vector Store (FREE — local persistent) ──────
-faiss-cpu==1.8.0.post1
+faiss-cpu==1.13.2
 
 # ── Validation ─────────────────────────────────
 pydantic==2.7.1
