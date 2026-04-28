@@ -1,0 +1,28 @@
+"""
+rag/chunker.py — simple text splitter using LangChain
+"""
+
+from typing import List, Dict
+from langchain.text_splitter import TokenTextSplitter
+
+# simple token-based splitter
+splitter = TokenTextSplitter(
+    chunk_size=150,
+    chunk_overlap=20
+)
+
+def chunk_text(text: str, source="", file_name="", doc_type="") -> List[Dict]:
+    chunks = splitter.split_text(text)
+
+    result = []
+    for i, chunk in enumerate(chunks):
+        result.append({
+            "text": chunk,
+            "source": source,
+            "fileName": file_name,
+            "type": doc_type,
+            "chunkIndex": i,
+        })
+        
+
+    return result

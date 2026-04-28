@@ -1,0 +1,11 @@
+Tushar - Software Engineer
+
+Experience:
+- Built full-stack applications using React, Node.js, and MongoDB.
+- Implemented AI agents using LangChain and LangGraph.
+- Strong focus on responsive design and RESTful APIs.
+
+Education:
+- B.S. in Computer Science
+
+Skills: JavaScript, Python, React, FastAPI, MongoDB, PostgreSQL.
