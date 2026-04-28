@@ -1,7 +1,7 @@
 """
 controllers/chat_controller.py — Handles chat and session-end requests.
 """
-from utils.models import ChatRequest, EndSessionRequest
+from utils.models import ChatRequest
 from agents.runAgent import run_agent
 from pydantic import BaseModel, Field
 
@@ -14,11 +14,6 @@ class ChatResponse(BaseModel):
     toolResult: dict | None = None
     escalated:  bool        = False
     metadata:   dict        = Field(default_factory=dict)
-
-
-class EndSessionResponse(BaseModel):
-    success: bool
-    message: str
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -41,11 +36,12 @@ async def handle_chat(request: ChatRequest) -> ChatResponse:
         metadata   = result.get("metadata", {}),
     )
 
-async def handle_end_session(request: EndSessionRequest) -> EndSessionResponse:
+async def handle_clear_session(user_id: str) -> dict:
     """
-    End-session handler — wipes all volatile memory for the given userId.
+    Clears session for a specific user ID.
     """
-    return EndSessionResponse(
-        success=True,
-        message=f"Session memory cleared for user '{request.userId}'.",
-    )
+    from graph.builder import clear_session
+    clear_session(user_id)
+    return {"success": True, "message": f"Session for {user_id} removed."}
+
+

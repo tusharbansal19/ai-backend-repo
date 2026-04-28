@@ -30,3 +30,12 @@ builder.add_edge(START, "agent")
 builder.add_edge("agent", END)
 
 graph = builder.compile(checkpointer=checkpointer)
+
+def clear_session(user_id: str):
+    """
+    Deletes the checkpoint for the given user_id (thread_id).
+    """
+    config = {"configurable": {"thread_id": user_id}}
+    # MemorySaver.delete_thread deletes all checkpoints for a thread
+    checkpointer.delete_thread(config)
+    return True

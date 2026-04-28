@@ -11,5 +11,4 @@ class ChatRequest(BaseModel):
             raise ValueError("message cannot be blank or whitespace only")
         return v.strip()
 
-class EndSessionRequest(BaseModel):
-    userId: str = Field(..., min_length=1, max_length=100)
+
