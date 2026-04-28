@@ -15,22 +15,23 @@ from tools.langchain_tools import TOOLS
 
 
 # ── 1. Build LLM ─────────────────────────────────────
-@lru_cache(maxsize=1)
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY", "").strip()
+
 def build_llm():
     """
-    Lazy load LLM (only once)
+    Build the LLM instance using OpenRouter.
     """
-    api_key = os.getenv("OPENROUTER_API_KEY") or os.getenv("OPENROUTER_API_KEY")
-
-    if not api_key:
-        return None
+    if not OPENROUTER_API_KEY:
+        raise ValueError(
+            "OPENROUTER_API_KEY is missing. Add it in your .env file."
+        )
 
     try:
         from langchain_openai import ChatOpenAI
 
         return ChatOpenAI(
             model="openai/gpt-oss-20b:free",
-            api_key=api_key,
+            api_key=OPENROUTER_API_KEY,
             base_url="https://openrouter.ai/api/v1",
             temperature=0,
         )
@@ -40,7 +41,6 @@ def build_llm():
 
 
 # ── 2. Build Agent ───────────────────────────────────
-@lru_cache(maxsize=1)
 def build_agent(prompt: str | None = None):
     """
     Create LangChain ReAct agent with tools
@@ -52,10 +52,13 @@ def build_agent(prompt: str | None = None):
     try:
         from langgraph.prebuilt import create_react_agent
 
+        # Use the passed system prompt or a default one
+        system_prompt = prompt or "You are a helpful AI assistant."
+
         agent = create_react_agent(
             model=llm,
             tools=TOOLS,
-            prompt="try to give short answer around 50-100 words",
+            state_modifier=system_prompt,
             checkpointer=None
         )
 

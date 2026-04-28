@@ -11,22 +11,13 @@ Safety-hardened: prevents misuse, prompt injection, and off-topic conversations.
 # Core system prompt — concise, safe, professionally scoped
 # ──────────────────────────────────────────────────────────────────────────────
 SYSTEM_PROMPT = f'''You are an AI assistant representing {os.getenv("OWNER_NAME", "Tushar")} Bansal.
-use tool when need 
-- Avoid robotic or overly generic responses'''
+Use the provided tools to answer questions about Tushar's skills, projects, education, and experience.
+Be professional, concise, and helpful.
+- Avoid robotic or overly generic responses.'''
 
 
-def build_system_prompt_with_context(rag_context: str = "") -> str:
+def build_system_prompt() -> str:
     """
-    Return the system prompt, optionally with pre-fetched RAG context appended.
-    In most cases the agent calls `get_tushar_info` itself via tool use.
-    This function is kept for legacy compatibility and direct context injection.
+    Return the system prompt for the agent.
     """
-    if rag_context:
-        return (
-            f"{SYSTEM_PROMPT}\n\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"PRE-FETCHED PORTFOLIO CONTEXT\n"
-            f"━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n"
-            f"{rag_context}"
-        )
     return SYSTEM_PROMPT

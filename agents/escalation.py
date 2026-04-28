@@ -25,21 +25,20 @@ PROFESSIONAL_SIGNALS = [
 ]
 
 
-def should_escalate(user_message: str, rag_chunks: List[Dict[str, Any]]) -> bool:
+def should_escalate(user_message: str) -> bool:
     """
     Return True when the message should escalate to a human.
 
     Triggers on:
       - Explicit 'talk to / contact Tushar' requests
-      - Professional / hiring inquiries that RAG cannot answer
+      - Professional / hiring inquiries
     """
     msg_lower = user_message.lower()
 
     if any(kw in msg_lower for kw in ESCALATION_KEYWORDS):
         return True
 
-    # Professional inquiry with no relevant context found
-    if not rag_chunks and any(sig in msg_lower for sig in PROFESSIONAL_SIGNALS):
+    if any(sig in msg_lower for sig in PROFESSIONAL_SIGNALS):
         return True
 
     return False

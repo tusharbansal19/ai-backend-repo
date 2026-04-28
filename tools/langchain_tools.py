@@ -5,15 +5,20 @@ load_dotenv()
 tools/langchain_tools.py
 LangChain @tool functions available to the portfolio agent.
 
-Only the two requested tools are exported:
-    1. send_email      — contact Tushar on behalf of a visitor.
-    2. get_tushar_info — RAG retrieval over the portfolio knowledge base.
+Tools:
+    1. send_email                 — contact Tushar on behalf of a visitor.
+    2. get_tushar_academic_info   — academic background.
+    3. get_tushar_profile         — general narrative.
+    4. get_tushar_skills          — technical stack.
+    5. get_tushar_projects        — project details.
+    6. get_tushar_experience      — professional background.
+    7. get_tushar_mentorship      — DSA mentorship info.
+    8. get_tushar_certifications  — certifications and streaks.
 """
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from langchain_core.tools import tool
-from rag.retriever import format_context_for_prompt, retrieve_context
 
 
 # ──────────────────────────────────────────────────────────────────────────────
@@ -75,42 +80,112 @@ def send_email(name: str, email: str, message: str) -> str:
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# Tool 2 — RAG retrieval (portfolio knowledge base)
+# Portfolio Information Tools (Pre-made messages)
 # ──────────────────────────────────────────────────────────────────────────────
+
 @tool
-def get_tushar_info(query: str) -> str:
+def get_tushar_academic_info() -> str:
     """
-    Retrieve relevant information about Tushar Bansal from the portfolio
-    knowledge base using semantic search (RAG).
-
-    Use this tool whenever a visitor asks about:
-      - Tushar's skills, technologies, or tech stack
-      - His projects (SaatPherasWorldwide, FastFinger, Tushar Automobiles, etc.)
-      - His education (AKTU, CGPA, Class 10/12 scores)
-      - His professional experience (internship, team lead)
-      - His DSA mentorship (70+ students)
-      - His certifications (NVIDIA Deep Learning, Infosys ML)
-      - His GitHub, LeetCode streaks, or any personal/professional background
-      - General "who is Tushar?" or "tell me about Tushar" questions
-
-    Args:
-        query : A natural-language question or topic about Tushar.
-
-    Returns:
-        Formatted context string from the portfolio knowledge base,
-        or a fallback message if no relevant information is found.
+    Get information about Tushar Bansal's academic background, including his 
+    degree, university (AKTU), CGPA (8.5), and school scores (Class 10/12).
     """
-    chunks = retrieve_context(query)
-    print("TOOL CALLING HAPPEN >..................", chunks)
-    if not chunks:
-        return (
-            f"I couldn't find specific information about that in my knowledge base. "
-            f"Please ask a more specific question about {os.getenv('OWNER_NAME', 'Tushar')}'s skills, projects, education, or experience."
-        )
-    return format_context_for_prompt(chunks)
+    return (
+        "Tushar Bansal is currently pursuing a Bachelor of Technology in Computer Science "
+        "from Dr. A.P.J. Abdul Kalam Technical University (2022–2026), maintaining an "
+        "impressive CGPA of 8.5. He secured 90% in Class 12 (CBSE, Science) and 82.8% in Class 10. "
+        "His academic foundation is built on a deep understanding of core CS subjects like DSA, "
+        "Operating Systems, DBMS, and Software Engineering."
+    )
+
+@tool
+def get_tushar_profile() -> str:
+    """
+    Get a general professional profile/narrative of Tushar Bansal.
+    """
+    return (
+        "Tushar Bansal is a technically versatile Full Stack Developer specializing in "
+        "scalable, production-grade applications using the MERN stack and Next.js. "
+        "His development philosophy centers around performance, clean architecture, "
+        "and user-centric design. He has a strong foundation in system design and "
+        "real-time communication frameworks like Socket.IO."
+    )
+
+@tool
+def get_tushar_skills() -> str:
+    """
+    Get a list of Tushar Bansal's technical skills, including programming languages, 
+    frameworks, databases, and tools.
+    """
+    return (
+        "Tushar's technical skill set includes:\n"
+        "- Languages: Python, Java, JavaScript, C/C++\n"
+        "- Frontend: React.js, Next.js, Tailwind CSS\n"
+        "- Backend: Node.js, Express.js, NestJS\n"
+        "- Databases: MongoDB, MySQL, PostgreSQL, Prisma ORM\n"
+        "- Tools: Git, GitHub, Postman, Swagger, AWS (EC2, S3), CI/CD pipelines"
+    )
+
+@tool
+def get_tushar_projects() -> str:
+    """
+    Get details about Tushar Bansal's key projects like SaatPherasWorldwide, 
+    FastFinger, and Tushar Automobiles.
+    """
+    return (
+        "Tushar has built several high-impact projects:\n"
+        "1. SaatPherasWorldwide: A large-scale NRI-focused matrimonial platform with real-time chat (Socket.IO), JWT auth, and RBAC.\n"
+        "2. FastFinger: A collaborative multiplayer typing application showcasing high-concurrency architecture and WebSockets.\n"
+        "3. Tushar Automobiles: An SEO-driven e-commerce system built with Next.js, Prisma, and Redux, featuring SSR/SSG for max performance."
+    )
+
+@tool
+def get_tushar_experience() -> str:
+    """
+    Get information about Tushar Bansal's professional experience and internships.
+    """
+    return (
+        "Tushar worked as a Full Stack Developer intern at a Canada-based organization, "
+        "where he built production-grade APIs, implemented JWT-based security guards, "
+        "and optimized system reliability. He also served as a Team Lead for an academic "
+        "internship project, guiding his team to build high-performance applications."
+    )
+
+@tool
+def get_tushar_mentorship() -> str:
+    """
+    Get information about Tushar Bansal's experience as a DSA mentor.
+    """
+    return (
+        "Tushar has successfully mentored over 70+ junior students in Data Structures "
+        "and Algorithms (DSA). He designed structured learning sessions and emphasized "
+        "pattern-based problem-solving. He was awarded an official mentorship certificate "
+        "for his dedication and impact in fostering a strong learning culture."
+    )
+
+@tool
+def get_tushar_certifications() -> str:
+    """
+    Get details about Tushar Bansal's certifications.
+    """
+    return (
+        "Tushar holds certifications in:\n"
+        "- Deep Learning from NVIDIA\n"
+        "- Machine Learning from Infosys Springboard\n"
+        "He is also a consistent coder on LeetCode with 50, 100, and 365-day streak badges."
+    )
 
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Exported tool list passed to the agent
 # ──────────────────────────────────────────────────────────────────────────────
-TOOLS = [send_email , get_tushar_info]
+TOOLS = [
+    send_email,
+    get_tushar_academic_info,
+    get_tushar_profile,
+    get_tushar_skills,
+    get_tushar_projects,
+    get_tushar_experience,
+    get_tushar_mentorship,
+    get_tushar_certifications
+]
+
