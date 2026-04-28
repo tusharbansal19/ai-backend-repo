@@ -35,7 +35,7 @@ def clear_session(user_id: str):
     """
     Deletes the checkpoint for the given user_id (thread_id).
     """
-    config = {"configurable": {"thread_id": user_id}}
-    # MemorySaver.delete_thread deletes all checkpoints for a thread
-    checkpointer.delete_thread(config)
-    return True
+    # MemorySaver.delete_thread expects the thread_id string directly
+    checkpointer.delete_thread(user_id)
+    return True
+
