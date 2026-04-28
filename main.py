@@ -1,6 +1,8 @@
+print("DEBUG: main.py is being loaded...")
 import os
 from dotenv import load_dotenv
 load_dotenv()
+print(f"DEBUG: Environment loaded. PORT={os.getenv('PORT')}")
 """
 main.py — FastAPI application entry point for the portfolio assistant.
 """
@@ -18,6 +20,7 @@ from utils.rate_limiter import rate_limit_middleware
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    print("DEBUG: Lifespan starting...")
     print("Initializing models and FAISS datastore...")
     from rag.embedder import get_embedding_model
     from config.faiss_store import get_faiss_store
