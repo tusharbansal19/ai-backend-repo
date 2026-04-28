@@ -14,6 +14,7 @@ Tools:
     6. get_tushar_experience      — professional background.
     7. get_tushar_mentorship      — DSA mentorship info.
     8. get_tushar_certifications  — certifications and streaks.
+    9. get_tushar_contact_info     — personal and contact details.
 """
 import smtplib
 from email.mime.text import MIMEText
@@ -175,6 +176,29 @@ def get_tushar_certifications() -> str:
     )
 
 
+@tool
+def get_tushar_contact_info() -> str:
+    """
+    Get Tushar Bansal's personal contact information, links, and location.
+    Use this when a visitor asks for his email, phone number, LinkedIn, GitHub, 
+    resume, or how to connect with him.
+    """
+    return (
+        "Tushar Bansal's Contact Information:\n"
+        "- Email: tusharbansal3366@gmail.com\n"
+        "- Phone: +91 9719167530\n"
+        "- Hometown: Siyana, Bulandshahr, Uttar Pradesh (Stand Up India)\n"
+        "\nImportant Links:\n"
+        "- LinkedIn: https://www.linkedin.com/in/tushar-bansal-79aa6828b\n"
+        "- GitHub: https://github.com/tusharbansal19\n"
+        "- Portfolio: https://tushar-bansal-portfolio.onrender.com\n"
+        "- Typing App: https://typing-webapp-frountend.onrender.com/\n"
+        "- Resume (Google Drive): https://drive.google.com/file/d/1kvvsuX5znWMxQ7gZTNU5fvlqVxzLIPLi/view?usp=sharing\n"
+        "- Professional Document: https://docs.google.com/document/d/1AgqhNhj4L0uF0It0bc4fSlOVyP42h-_zQWq87877Rq8/edit?usp=drivesdk\n"
+        "- Other Drive Link: https://drive.google.com/file/d/19gCXDZYQQKiJo1lbIRcaiRy8oB4Gor0h/view?usp=drive_link"
+    )
+
+
 # ──────────────────────────────────────────────────────────────────────────────
 # Exported tool list passed to the agent
 # ──────────────────────────────────────────────────────────────────────────────
@@ -186,6 +210,7 @@ TOOLS = [
     get_tushar_projects,
     get_tushar_experience,
     get_tushar_mentorship,
-    get_tushar_certifications
+    get_tushar_certifications,
+    get_tushar_contact_info
 ]
 
